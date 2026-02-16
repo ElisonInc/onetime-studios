@@ -1,11 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, MapPin, Calendar, Clock, Zap, CheckCircle, Shield, DollarSign } from 'lucide-react';
+import { ChevronDown, MapPin, Calendar, Clock, Zap, CheckCircle, Shield } from 'lucide-react';
 
 export default function Home() {
-  const [activeTab, = useState('search');
-
   return (
     <div className="w-full bg-white">
       {/* Header/Navigation */}
@@ -40,11 +38,11 @@ export default function Home() {
             Real availability. Instant confirmation. No back-and-forth.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <button id="search" className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
-              <Search className="w-4 h-4" />
+            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto">
+              <MapPin className="w-4 h-4" />
               Search by date & time
             </button>
-            <button id="owner" className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
               List your studio
             </button>
           </div>
@@ -114,7 +112,7 @@ export default function Home() {
                   <div className="bg-gray-200 h-40"></div>
                   <div className="p-4">
                     <h4 className="font-semibold mb-2">Studio {i}</h4>
-                    <p className="text-sm text-gray-600 mb-4">Professional recording space with equipment included</p>
+                    <p className="text-sm text-gray-600 mb-4">Professional recording space with equipment</p>
                     <div className="flex justify-between items-center">
                       <span className="font-bold">$50/hr</span>
                       <button className="text-blue-600 text-sm hover:underline">Pick a time</button>
@@ -277,8 +275,4 @@ export default function Home() {
       </footer>
     </div>
   );
-}
-
-function Search() {
-  return <MapPin className="w-4 h-4" />;
 }
