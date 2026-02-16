@@ -1,53 +1,82 @@
 'use client';
 
-import { ChevronDown, MapPin, Zap, CheckCircle, Shield } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown, MapPin, Zap, CheckCircle, Shield, Menu, X } from 'lucide-react';
 
 export default function Home() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <div className="w-full bg-white">
       {/* Header/Navigation */}
-      <header className="border-b sticky top-0 bg-white z-10">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <header className="border-b sticky top-0 bg-white z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Zap className="w-6 h-6 text-blue-600" />
-            <span className="font-bold text-lg">OneTime Studios</span>
+            <span className="font-bold text-lg hidden sm:inline">OneTime Studios</span>
+            <span className="font-bold text-base sm:hidden">OTS</span>
           </div>
-          <nav className="flex gap-6 text-sm">
+
+          {/* Desktop Navigation */}
+          <nav className="hidden sm:flex gap-6 text-sm">
             <a href="#search" className="text-gray-600 hover:text-gray-900">Search Studios</a>
             <a href="#owner" className="text-gray-600 hover:text-gray-900">For Owners</a>
           </nav>
-          <div className="flex gap-2">
-            <button className="px-4 py-2 text-gray-600 hover:text-gray-900">Sign In</button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Get Started</button>
+
+          {/* Desktop Auth Buttons */}
+          <div className="hidden sm:flex gap-2">
+            <button className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm">Sign In</button>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Get Started</button>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="sm:hidden p-2"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="sm:hidden border-t bg-white">
+            <nav className="px-4 py-4 space-y-3">
+              <a href="#search" className="block text-gray-600 hover:text-gray-900">Search Studios</a>
+              <a href="#owner" className="block text-gray-600 hover:text-gray-900">For Owners</a>
+              <hr className="my-3" />
+              <button className="w-full px-4 py-2 text-gray-600 hover:text-gray-900 text-left">Sign In</button>
+              <button className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Get Started</button>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-purple-50 py-16">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 sm:py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="flex items-center justify-center gap-2 mb-4 sm:mb-6">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm text-gray-600">🟢 1,240 studios available now</span>
+            <span className="text-xs sm:text-sm text-gray-600">🟢 1,240 studios available now</span>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
             Book Studio Space in Under 2 Minutes
           </h1>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
             Real availability. Instant confirmation. No back-and-forth.
           </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto">
+          <div className="flex gap-3 justify-center flex-col sm:flex-row">
+            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 justify-center w-full sm:w-auto">
               <MapPin className="w-4 h-4" />
-              Search by date & time
+              <span>Search Studios</span>
             </button>
-            <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto">
               List your studio
             </button>
           </div>
 
           {/* Trust Badges */}
-          <div className="grid md:grid-cols-3 gap-4 max-w-2xl mx-auto mt-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-2xl mx-auto mt-10 sm:mt-12">
             <div className="p-4 bg-white rounded-lg border">
               <CheckCircle className="w-6 h-6 text-blue-600 mx-auto mb-2" />
               <p className="font-medium text-sm">Instant confirmation</p>
@@ -65,25 +94,25 @@ export default function Home() {
       </section>
 
       {/* Search Section */}
-      <section className="py-16 bg-white border-b">
+      <section id="search" className="py-12 sm:py-16 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-gray-50 rounded-xl p-8">
-            <div className="grid md:grid-cols-5 gap-4 mb-6">
+          <div className="bg-gray-50 rounded-xl p-4 sm:p-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-4 sm:mb-6">
               <div>
-                <label className="block text-sm font-medium mb-2">Location</label>
-                <input type="text" placeholder="Enter city" className="w-full border rounded-lg px-3 py-2" />
+                <label className="block text-xs sm:text-sm font-medium mb-2">Location</label>
+                <input type="text" placeholder="Enter city" className="w-full border rounded-lg px-3 py-2 text-sm" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Date</label>
-                <input type="date" className="w-full border rounded-lg px-3 py-2" />
+                <label className="block text-xs sm:text-sm font-medium mb-2">Date</label>
+                <input type="date" className="w-full border rounded-lg px-3 py-2 text-sm" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Time</label>
-                <input type="time" className="w-full border rounded-lg px-3 py-2" />
+                <label className="block text-xs sm:text-sm font-medium mb-2">Time</label>
+                <input type="time" className="w-full border rounded-lg px-3 py-2 text-sm" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Session Type</label>
-                <select className="w-full border rounded-lg px-3 py-2">
+                <label className="block text-xs sm:text-sm font-medium mb-2">Type</label>
+                <select className="w-full border rounded-lg px-3 py-2 text-sm">
                   <option>All Types</option>
                   <option>Recording</option>
                   <option>Photo</option>
@@ -91,7 +120,7 @@ export default function Home() {
                 </select>
               </div>
               <div className="flex items-end">
-                <button className="w-full bg-blue-600 text-white rounded-lg py-2 hover:bg-blue-700 font-medium">
+                <button className="w-full bg-blue-600 text-white rounded-lg py-2 hover:bg-blue-700 font-medium text-sm">
                   Search
                 </button>
               </div>
@@ -100,21 +129,21 @@ export default function Home() {
 
           {/* Results */}
           <div className="mt-8">
-            <p className="text-gray-600 mb-6">Showing 24 studios near Los Angeles</p>
-            <div className="flex gap-4 items-center mb-6">
-              <span className="text-sm text-gray-600">Sort by:</span>
-              <button className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm">Availability</button>
+            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">Showing 24 studios near Los Angeles</p>
+            <div className="flex gap-2 sm:gap-4 items-center mb-4 sm:mb-6 overflow-x-auto pb-2">
+              <span className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Sort by:</span>
+              <button className="px-3 sm:px-4 py-2 border rounded-lg hover:bg-gray-50 text-xs sm:text-sm whitespace-nowrap">Availability</button>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="border rounded-lg overflow-hidden hover:shadow-lg transition">
-                  <div className="bg-gray-200 h-40"></div>
+                  <div className="bg-gray-200 h-40 sm:h-48"></div>
                   <div className="p-4">
-                    <h4 className="font-semibold mb-2">Studio {i}</h4>
-                    <p className="text-sm text-gray-600 mb-4">Professional recording space with equipment</p>
+                    <h4 className="font-semibold mb-2 text-sm sm:text-base">Studio {i}</h4>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-4">Professional recording space with equipment</p>
                     <div className="flex justify-between items-center">
-                      <span className="font-bold">$50/hr</span>
-                      <button className="text-blue-600 text-sm hover:underline">Pick a time</button>
+                      <span className="font-bold text-sm sm:text-base">$50/hr</span>
+                      <button className="text-blue-600 text-xs sm:text-sm hover:underline">Pick time</button>
                     </div>
                   </div>
                 </div>
@@ -125,11 +154,11 @@ export default function Home() {
       </section>
 
       {/* Why Artists Trust Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-12 sm:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4">Why artists trust OTS</h2>
-          <p className="text-center text-gray-600 mb-12">Built for creators, by creators</p>
-          <div className="grid md:grid-cols-3 gap-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-2 sm:mb-4">Why artists trust OTS</h2>
+          <p className="text-center text-gray-600 mb-8 sm:mb-12 text-sm sm:text-base">Built for creators, by creators</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
             {[
               { icon: '📅', title: 'Real-time availability', desc: 'What you see is what you get. No surprises.' },
               { icon: '⚡', title: 'Instant booking', desc: 'Book in under 2 minutes. Confirmed immediately.' },
@@ -137,8 +166,8 @@ export default function Home() {
             ].map((item, i) => (
               <div key={i} className="text-center">
                 <div className="text-4xl mb-4">{item.icon}</div>
-                <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.desc}</p>
+                <h3 className="font-semibold text-base sm:text-lg mb-2">{item.title}</h3>
+                <p className="text-gray-600 text-sm sm:text-base">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -146,34 +175,34 @@ export default function Home() {
       </section>
 
       {/* For Studio Owners */}
-      <section className="py-16 bg-white">
+      <section id="owner" className="py-12 sm:py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-xl p-12">
-            <h2 className="text-3xl font-bold mb-4">For Studio Owners</h2>
-            <h3 className="text-2xl font-semibold mb-6">Turn unused studio time into revenue</h3>
-            <p className="mb-8 text-gray-300">
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-xl p-6 sm:p-12">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">For Studio Owners</h2>
+            <h3 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Turn unused studio time into revenue</h3>
+            <p className="mb-6 sm:mb-8 text-gray-300 text-sm sm:text-base">
               We handle scheduling, bookings, and payments. You focus on creating.
             </p>
-            <div className="flex gap-4 mb-8">
-              <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <div className="flex gap-3 sm:gap-4 mb-8 flex-col sm:flex-row">
+              <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base w-full sm:w-auto">
                 List your studio
               </button>
-              <button className="px-6 py-3 border border-white rounded-lg hover:bg-white/10">
+              <button className="px-6 py-3 border border-white rounded-lg hover:bg-white/10 text-sm sm:text-base w-full sm:w-auto">
                 Learn more
               </button>
             </div>
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-3 gap-4 sm:gap-8">
               <div>
-                <div className="text-3xl font-bold mb-2">$0</div>
-                <p className="text-gray-300">to list</p>
+                <div className="text-2xl sm:text-3xl font-bold mb-2">$0</div>
+                <p className="text-gray-300 text-xs sm:text-base">to list</p>
               </div>
               <div>
-                <div className="text-3xl font-bold mb-2">10%</div>
-                <p className="text-gray-300">platform fee</p>
+                <div className="text-2xl sm:text-3xl font-bold mb-2">10%</div>
+                <p className="text-gray-300 text-xs sm:text-base">platform fee</p>
               </div>
               <div>
-                <div className="text-3xl font-bold mb-2">24h</div>
-                <p className="text-gray-300">payout time</p>
+                <div className="text-2xl sm:text-3xl font-bold mb-2">24h</div>
+                <p className="text-gray-300 text-xs sm:text-base">payout time</p>
               </div>
             </div>
           </div>
@@ -181,10 +210,10 @@ export default function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-12 sm:py-16 bg-gray-50">
         <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Common questions</h2>
-          <div className="space-y-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Common questions</h2>
+          <div className="space-y-3 sm:space-y-4">
             {[
               {
                 q: 'How does payment work?',
@@ -204,11 +233,11 @@ export default function Home() {
               },
             ].map((item, i) => (
               <details key={i} className="group border rounded-lg">
-                <summary className="cursor-pointer p-4 font-medium flex items-center justify-between hover:bg-white">
+                <summary className="cursor-pointer p-3 sm:p-4 font-medium flex items-center justify-between hover:bg-white text-sm sm:text-base">
                   {item.q}
-                  <ChevronDown className="w-5 h-5 group-open:rotate-180 transition" />
+                  <ChevronDown className="w-5 h-5 group-open:rotate-180 transition flex-shrink-0" />
                 </summary>
-                <div className="px-4 pb-4 text-gray-600 bg-white border-t">
+                <div className="px-3 sm:px-4 pb-3 sm:pb-4 text-gray-600 bg-white border-t text-xs sm:text-sm">
                   {item.a}
                 </div>
               </details>
@@ -218,52 +247,52 @@ export default function Home() {
       </section>
 
       {/* Footer CTA */}
-      <section className="py-16 bg-white border-t">
+      <section className="py-12 sm:py-16 bg-white border-t">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to book your next session?</h2>
-          <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Ready to book your next session?</h2>
+          <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium w-full sm:w-auto">
             Find Studios Near You
           </button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-8 sm:py-12">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
             <div>
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
                 <Zap className="w-5 h-5" />
-                <span className="font-bold">OneTime Studios</span>
+                <span className="font-bold text-sm sm:text-base">OTS</span>
               </div>
-              <p className="text-sm text-gray-400">The fastest way to book studio space.</p>
+              <p className="text-xs sm:text-sm text-gray-400">The fastest way to book studio space.</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">For Bookers</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
+              <h4 className="font-semibold mb-3 text-sm">For Bookers</h4>
+              <ul className="space-y-2 text-xs sm:text-sm text-gray-400">
                 <li><a href="#" className="hover:text-white">Search Studios</a></li>
                 <li><a href="#" className="hover:text-white">My Bookings</a></li>
                 <li><a href="#" className="hover:text-white">Help</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">For Owners</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
+              <h4 className="font-semibold mb-3 text-sm">For Owners</h4>
+              <ul className="space-y-2 text-xs sm:text-sm text-gray-400">
                 <li><a href="#" className="hover:text-white">List Studio</a></li>
                 <li><a href="#" className="hover:text-white">Pricing</a></li>
                 <li><a href="#" className="hover:text-white">FAQ</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
+              <h4 className="font-semibold mb-3 text-sm">Legal</h4>
+              <ul className="space-y-2 text-xs sm:text-sm text-gray-400">
                 <li><a href="#" className="hover:text-white">Privacy</a></li>
                 <li><a href="#" className="hover:text-white">Terms</a></li>
                 <li><a href="#" className="hover:text-white">Contact</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-8 flex justify-between items-center text-sm text-gray-400">
+          <div className="border-t border-gray-800 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm text-gray-400">
             <p>© 2024 OneTime Studios</p>
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4" />
