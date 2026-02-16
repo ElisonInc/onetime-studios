@@ -6,6 +6,30 @@ import { ChevronDown, MapPin, Zap, CheckCircle, Shield, Menu, X } from 'lucide-r
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const handleNavigation = (section: string) => {
+    const element = document.getElementById(section);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleAuth = (type: 'signin' | 'signup') => {
+    console.log(`${type === 'signin' ? 'Sign In' : 'Get Started'} clicked`);
+    // TODO: Integrate with Clerk authentication
+    alert(`${type === 'signin' ? 'Sign In' : 'Get Started'} flow - Ready for Clerk integration`);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Search submitted');
+    alert('Search functionality ready - Connect to Supabase for real studio data');
+  };
+
+  const handlePickTime = (studioId: number) => {
+    console.log(`Pick time for studio ${studioId}`);
+    alert(`Booking flow for Studio ${studioId} - Ready for Stripe payment integration`);
+  };
+
   return (
     <div className="w-full bg-white">
       {/* Header/Navigation */}
@@ -25,8 +49,18 @@ export default function Home() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden sm:flex gap-2">
-            <button className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm">Sign In</button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Get Started</button>
+            <button 
+              onClick={() => handleAuth('signin')}
+              className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm"
+            >
+              Sign In
+            </button>
+            <button 
+              onClick={() => handleAuth('signup')}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+            >
+              Get Started
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -42,11 +76,37 @@ export default function Home() {
         {mobileMenuOpen && (
           <div className="sm:hidden border-t bg-white">
             <nav className="px-4 py-4 space-y-3">
-              <a href="#search" className="block text-gray-600 hover:text-gray-900">Search Studios</a>
-              <a href="#owner" className="block text-gray-600 hover:text-gray-900">For Owners</a>
+              <button 
+                onClick={() => {
+                  handleNavigation('search');
+                  setMobileMenuOpen(false);
+                }}
+                className="block text-gray-600 hover:text-gray-900 w-full text-left"
+              >
+                Search Studios
+              </button>
+              <button 
+                onClick={() => {
+                  handleNavigation('owner');
+                  setMobileMenuOpen(false);
+                }}
+                className="block text-gray-600 hover:text-gray-900 w-full text-left"
+              >
+                For Owners
+              </button>
               <hr className="my-3" />
-              <button className="w-full px-4 py-2 text-gray-600 hover:text-gray-900 text-left">Sign In</button>
-              <button className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Get Started</button>
+              <button 
+                onClick={() => handleAuth('signin')}
+                className="w-full px-4 py-2 text-gray-600 hover:text-gray-900 text-left"
+              >
+                Sign In
+              </button>
+              <button 
+                onClick={() => handleAuth('signup')}
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Get Started
+              </button>
             </nav>
           </div>
         )}
@@ -66,11 +126,17 @@ export default function Home() {
             Real availability. Instant confirmation. No back-and-forth.
           </p>
           <div className="flex gap-3 justify-center flex-col sm:flex-row">
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 justify-center w-full sm:w-auto">
+            <button 
+              onClick={() => handleNavigation('search')}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 justify-center w-full sm:w-auto"
+            >
               <MapPin className="w-4 h-4" />
               <span>Search Studios</span>
             </button>
-            <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto">
+            <button 
+              onClick={() => handleNavigation('owner')}
+              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto"
+            >
               List your studio
             </button>
           </div>
@@ -120,7 +186,10 @@ export default function Home() {
                 </select>
               </div>
               <div className="flex items-end">
-                <button className="w-full bg-blue-600 text-white rounded-lg py-2 hover:bg-blue-700 font-medium text-sm">
+                <button 
+                  onClick={handleSearch}
+                  className="w-full bg-blue-600 text-white rounded-lg py-2 hover:bg-blue-700 font-medium text-sm"
+                >
                   Search
                 </button>
               </div>
@@ -143,7 +212,12 @@ export default function Home() {
                     <p className="text-xs sm:text-sm text-gray-600 mb-4">Professional recording space with equipment</p>
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-sm sm:text-base">$50/hr</span>
-                      <button className="text-blue-600 text-xs sm:text-sm hover:underline">Pick time</button>
+                      <button 
+                        onClick={() => handlePickTime(i)}
+                        className="text-blue-600 text-xs sm:text-sm hover:underline"
+                      >
+                        Pick time
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -184,10 +258,16 @@ export default function Home() {
               We handle scheduling, bookings, and payments. You focus on creating.
             </p>
             <div className="flex gap-3 sm:gap-4 mb-8 flex-col sm:flex-row">
-              <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base w-full sm:w-auto">
+              <button 
+                onClick={() => handleNavigation('owner')}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base w-full sm:w-auto"
+              >
                 List your studio
               </button>
-              <button className="px-6 py-3 border border-white rounded-lg hover:bg-white/10 text-sm sm:text-base w-full sm:w-auto">
+              <button 
+                onClick={() => alert('Learn more about our owner program - Ready for detailed info page')}
+                className="px-6 py-3 border border-white rounded-lg hover:bg-white/10 text-sm sm:text-base w-full sm:w-auto"
+              >
                 Learn more
               </button>
             </div>
@@ -250,7 +330,10 @@ export default function Home() {
       <section className="py-12 sm:py-16 bg-white border-t">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Ready to book your next session?</h2>
-          <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium w-full sm:w-auto">
+          <button 
+            onClick={() => handleNavigation('search')}
+            className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium w-full sm:w-auto"
+          >
             Find Studios Near You
           </button>
         </div>
