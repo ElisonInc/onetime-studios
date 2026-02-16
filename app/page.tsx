@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronDown, MapPin, Calendar, Clock, Zap, CheckCircle, Shield } from 'lucide-react';
+import { ChevronDown, MapPin, Zap, CheckCircle, Shield } from 'lucide-react';
 
 export default function Home() {
   return (
