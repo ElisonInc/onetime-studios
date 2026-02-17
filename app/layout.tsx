@@ -20,7 +20,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        baseTheme: undefined,
+      }}
+    >
       <html lang="en">
         <body>{children}</body>
       </html>

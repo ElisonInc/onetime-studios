@@ -44,12 +44,12 @@ export default function Home() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden sm:flex gap-2">
-            <SignInButton>
+            <SignInButton mode="modal" fallbackRedirectUrl="/">
               <button className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm cursor-pointer">
                 Sign In
               </button>
             </SignInButton>
-            <SignUpButton>
+            <SignUpButton mode="modal" fallbackRedirectUrl="/">
               <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm cursor-pointer">
                 Get Started
               </button>
@@ -88,12 +88,12 @@ export default function Home() {
                 For Owners
               </button>
               <hr className="my-3" />
-              <SignInButton>
+              <SignInButton mode="modal" fallbackRedirectUrl="/">
                 <button className="w-full px-4 py-2 text-gray-600 hover:text-gray-900 text-left cursor-pointer">
                   Sign In
                 </button>
               </SignInButton>
-              <SignUpButton>
+              <SignUpButton mode="modal" fallbackRedirectUrl="/">
                 <button className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer">
                   Get Started
                 </button>
