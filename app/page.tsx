@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, MapPin, Zap, CheckCircle, Shield, Menu, X } from 'lucide-react';
+import { SignInButton, SignUpButton } from '@clerk/nextjs';
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -11,12 +12,6 @@ export default function Home() {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
-  };
-
-  const handleAuth = (type: 'signin' | 'signup') => {
-    console.log(`${type === 'signin' ? 'Sign In' : 'Get Started'} clicked`);
-    // TODO: Integrate with Clerk authentication
-    alert(`${type === 'signin' ? 'Sign In' : 'Get Started'} flow - Ready for Clerk integration`);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -49,18 +44,16 @@ export default function Home() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden sm:flex gap-2">
-            <button 
-              onClick={() => handleAuth('signin')}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm"
-            >
-              Sign In
-            </button>
-            <button 
-              onClick={() => handleAuth('signup')}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-            >
-              Get Started
-            </button>
+            <SignInButton>
+              <button className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm cursor-pointer">
+                Sign In
+              </button>
+            </SignInButton>
+            <SignUpButton>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm cursor-pointer">
+                Get Started
+              </button>
+            </SignUpButton>
           </div>
 
           {/* Mobile Menu Button */}
@@ -95,18 +88,16 @@ export default function Home() {
                 For Owners
               </button>
               <hr className="my-3" />
-              <button 
-                onClick={() => handleAuth('signin')}
-                className="w-full px-4 py-2 text-gray-600 hover:text-gray-900 text-left"
-              >
-                Sign In
-              </button>
-              <button 
-                onClick={() => handleAuth('signup')}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Get Started
-              </button>
+              <SignInButton>
+                <button className="w-full px-4 py-2 text-gray-600 hover:text-gray-900 text-left cursor-pointer">
+                  Sign In
+                </button>
+              </SignInButton>
+              <SignUpButton>
+                <button className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer">
+                  Get Started
+                </button>
+              </SignUpButton>
             </nav>
           </div>
         )}
