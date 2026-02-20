@@ -128,8 +128,6 @@ export function useParallax(speed = 0.5) {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!ref.current) return;
-      const rect = ref.current.getBoundingClientRect();
       const scrolled = window.scrollY;
       setOffset(scrolled * speed);
     };
