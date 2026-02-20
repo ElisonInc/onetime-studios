@@ -3,7 +3,7 @@ import { getFeaturedStudios } from '@/lib/data';
 import { Hero } from './hero';
 import { Studio } from '@/types';
 import Link from 'next/link';
-import { MapPin, Star, ArrowRight, Zap, CheckCircle2, Shield, Play, Users, TrendingUp } from 'lucide-react';
+import { MapPin, Star, ArrowRight, Zap, CheckCircle2, Shield } from 'lucide-react';
 
 export default function HomePage() {
   return (
