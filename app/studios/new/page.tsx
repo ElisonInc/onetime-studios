@@ -80,7 +80,7 @@ export default function NewStudioPage() {
       studio_type: formData.studioTypes,
       amenities: formData.amenities,
       images: images,
-      cover_image: images[0] || null,
+      cover_image: images[0] || undefined,
       status: 'active',
     });
 
