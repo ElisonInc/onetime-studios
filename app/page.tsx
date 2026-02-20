@@ -1,380 +1,395 @@
-'use client';
+import { Suspense } from 'react';
+import Link from 'next/link';
+import { getFeaturedStudios } from '@/lib/data';
+import { Hero } from './hero';
+import { Studio } from '@/types';
+import { MapPin, Star, Zap, Shield, CheckCircle2, ArrowRight } from 'lucide-react';
 
-import { useState } from 'react';
-import { ChevronDown, MapPin, Zap, CheckCircle, Shield, Menu, X } from 'lucide-react';
-import { SignInButton, SignUpButton } from '@clerk/nextjs';
+export default function HomePage() {
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <Hero />
+      
+      <Suspense fallback={<FeaturedStudiosSkeleton />}>
+        <FeaturedStudios />
+      </Suspense>
+      
+      <HowItWorks />
+      <ForOwners />
+      <Testimonials />
+      <CTA />
+      <Footer />
+    </div>
+  );
+}
 
-export default function Home() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const handleNavigation = (section: string) => {
-    const element = document.getElementById(section);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Search submitted');
-    alert('Search functionality ready - Connect to Supabase for real studio data');
-  };
-
-  const handlePickTime = (studioId: number) => {
-    console.log(`Pick time for studio ${studioId}`);
-    alert(`Booking flow for Studio ${studioId} - Ready for Stripe payment integration`);
-  };
+async function FeaturedStudios() {
+  const studios = await getFeaturedStudios(4);
 
   return (
-    <div className="w-full bg-white">
-      {/* Header/Navigation */}
-      <header className="border-b sticky top-0 bg-white z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Zap className="w-6 h-6 text-blue-600" />
-            <span className="font-bold text-lg hidden sm:inline">OneTime Studios</span>
-            <span className="font-bold text-base sm:hidden">OTS</span>
+    <section id="studios" className="py-20 md:py-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-end justify-between mb-10">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-2">Featured Studios</h2>
+            <p className="text-gray-400">Hand-picked spaces available today</p>
           </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden sm:flex gap-6 text-sm">
-            <a href="#search" className="text-gray-600 hover:text-gray-900">Search Studios</a>
-            <a href="#owner" className="text-gray-600 hover:text-gray-900">For Owners</a>
-          </nav>
-
-          {/* Desktop Auth Buttons */}
-          <div className="hidden sm:flex gap-2">
-            <SignInButton mode="modal" fallbackRedirectUrl="/">
-              <button className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm cursor-pointer">
-                Sign In
-              </button>
-            </SignInButton>
-            <SignUpButton mode="modal" fallbackRedirectUrl="/">
-              <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm cursor-pointer">
-                Get Started
-              </button>
-            </SignUpButton>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="sm:hidden p-2"
+          <Link 
+            href="/studios" 
+            className="hidden md:flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+            View all studios
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="sm:hidden border-t bg-white">
-            <nav className="px-4 py-4 space-y-3">
-              <button 
-                onClick={() => {
-                  handleNavigation('search');
-                  setMobileMenuOpen(false);
-                }}
-                className="block text-gray-600 hover:text-gray-900 w-full text-left"
-              >
-                Search Studios
-              </button>
-              <button 
-                onClick={() => {
-                  handleNavigation('owner');
-                  setMobileMenuOpen(false);
-                }}
-                className="block text-gray-600 hover:text-gray-900 w-full text-left"
-              >
-                For Owners
-              </button>
-              <hr className="my-3" />
-              <SignInButton mode="modal" fallbackRedirectUrl="/">
-                <button className="w-full px-4 py-2 text-gray-600 hover:text-gray-900 text-left cursor-pointer">
-                  Sign In
-                </button>
-              </SignInButton>
-              <SignUpButton mode="modal" fallbackRedirectUrl="/">
-                <button className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer">
-                  Get Started
-                </button>
-              </SignUpButton>
-            </nav>
+        {studios.length === 0 ? (
+          <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10">
+            <div className="text-5xl mb-4">🏗️</div>
+            <h3 className="text-xl font-semibold mb-2">Studios coming soon</h3>
+            <p className="text-gray-400">We&apos;re onboarding new studios every day</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {studios.map((studio) => (
+              <StudioCard key={studio.id} studio={studio} />
+            ))}
           </div>
         )}
-      </header>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 sm:py-16 md:py-20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <div className="flex items-center justify-center gap-2 mb-4 sm:mb-6">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-xs sm:text-sm text-gray-600">🟢 1,240 studios available now</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
-            Book Studio Space in Under 2 Minutes
-          </h1>
-          <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
-            Real availability. Instant confirmation. No back-and-forth.
-          </p>
-          <div className="flex gap-3 justify-center flex-col sm:flex-row">
-            <button 
-              onClick={() => handleNavigation('search')}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 justify-center w-full sm:w-auto"
-            >
-              <MapPin className="w-4 h-4" />
-              <span>Search Studios</span>
-            </button>
-            <button 
-              onClick={() => handleNavigation('owner')}
-              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto"
-            >
-              List your studio
-            </button>
-          </div>
-
-          {/* Trust Badges */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-2xl mx-auto mt-10 sm:mt-12">
-            <div className="p-4 bg-white rounded-lg border">
-              <CheckCircle className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-              <p className="font-medium text-sm">Instant confirmation</p>
-            </div>
-            <div className="p-4 bg-white rounded-lg border">
-              <Zap className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-              <p className="font-medium text-sm">No back-and-forth</p>
-            </div>
-            <div className="p-4 bg-white rounded-lg border">
-              <Shield className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-              <p className="font-medium text-sm">Secure payment hold</p>
-            </div>
-          </div>
+        <div className="mt-8 text-center md:hidden">
+          <Link href="/studios" className="inline-flex items-center gap-2 text-sm text-blue-400">
+            View all studios
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* Search Section */}
-      <section id="search" className="py-12 sm:py-16 bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-gray-50 rounded-xl p-4 sm:p-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <div>
-                <label className="block text-xs sm:text-sm font-medium mb-2">Location</label>
-                <input type="text" placeholder="Enter city" className="w-full border rounded-lg px-3 py-2 text-sm" />
-              </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium mb-2">Date</label>
-                <input type="date" className="w-full border rounded-lg px-3 py-2 text-sm" />
-              </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium mb-2">Time</label>
-                <input type="time" className="w-full border rounded-lg px-3 py-2 text-sm" />
-              </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium mb-2">Type</label>
-                <select className="w-full border rounded-lg px-3 py-2 text-sm">
-                  <option>All Types</option>
-                  <option>Recording</option>
-                  <option>Photo</option>
-                  <option>Video</option>
-                </select>
-              </div>
-              <div className="flex items-end">
-                <button 
-                  onClick={handleSearch}
-                  className="w-full bg-blue-600 text-white rounded-lg py-2 hover:bg-blue-700 font-medium text-sm"
-                >
-                  Search
-                </button>
+function FeaturedStudiosSkeleton() {
+  return (
+    <section className="py-20 md:py-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="h-10 bg-white/10 rounded w-64 mb-10 animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+              <div className="aspect-[4/3] bg-white/10 animate-pulse" />
+              <div className="p-5 space-y-3">
+                <div className="h-4 bg-white/10 rounded w-20 animate-pulse" />
+                <div className="h-6 bg-white/10 rounded w-3/4 animate-pulse" />
+                <div className="h-4 bg-white/10 rounded w-1/2 animate-pulse" />
               </div>
             </div>
-          </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-          {/* Results */}
-          <div className="mt-8">
-            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">Showing 24 studios near Los Angeles</p>
-            <div className="flex gap-2 sm:gap-4 items-center mb-4 sm:mb-6 overflow-x-auto pb-2">
-              <span className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Sort by:</span>
-              <button className="px-3 sm:px-4 py-2 border rounded-lg hover:bg-gray-50 text-xs sm:text-sm whitespace-nowrap">Availability</button>
+function StudioCard({ studio }: { studio: Studio }) {
+  const typeEmoji: Record<string, string> = {
+    recording: '🎵',
+    photography: '📸',
+    video: '🎬',
+    rehearsal: '🎸',
+    podcast: '🎙️',
+  };
+
+  const emoji = studio.studio_type?.[0] ? typeEmoji[studio.studio_type[0]] || '🎵' : '🎵';
+
+  return (
+    <Link 
+      href={`/studios/${studio.slug}`} 
+      className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-all duration-300 hover:transform hover:scale-[1.02]"
+    >
+      <div className="aspect-[4/3] bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-6xl relative overflow-hidden">
+        {emoji}
+        <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-lg text-xs text-white">
+          ${studio.hourly_rate}/hr
+        </div>
+      </div>
+      
+      <div className="p-5">
+        <div className="flex items-center gap-1 mb-2">
+          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+          <span className="text-sm font-medium">4.9</span>
+          <span className="text-sm text-gray-400">(120+ reviews)</span>
+        </div>
+        
+        <h3 className="font-semibold text-lg mb-1 text-white group-hover:text-blue-400 transition">
+          {studio.name}
+        </h3>
+        <p className="text-sm text-gray-400 mb-3 flex items-center gap-1">
+          <MapPin className="w-3 h-3" />
+          {studio.city}, {studio.state}
+        </p>
+        
+        <div className="flex flex-wrap gap-2">
+          {studio.studio_type?.slice(0, 2).map((type, i) => (
+            <span key={i} className="text-xs px-2 py-1 bg-white/5 rounded-full text-gray-300 capitalize">
+              {type}
+            </span>
+          ))}
+          {studio.amenities?.slice(0, 2).map((amenity, i) => (
+            <span key={i} className="text-xs px-2 py-1 bg-white/5 rounded-full text-gray-300">
+              {amenity}
+            </span>
+          ))}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function HowItWorks() {
+  return (
+    <section id="how-it-works" className="py-20 md:py-32 bg-white/5 border-y border-white/10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">How OneTime Works</h2>
+          <p className="text-gray-400 text-lg">
+            Book professional studio space in 3 simple steps
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              step: "01",
+              title: "Search",
+              description: "Find studios near you with real-time availability. Filter by type, price, and amenities.",
+            },
+            {
+              step: "02",
+              title: "Book",
+              description: "Select your time slot and pay securely. Your booking is confirmed instantly.",
+            },
+            {
+              step: "03",
+              title: "Create",
+              description: "Show up and make magic. Rate your experience when you're done.",
+            }
+          ].map((item, i) => (
+            <div key={i} className="relative">
+              <div className="text-6xl font-bold text-white/5 absolute -top-6 left-0">{item.step}</div>
+              <div className="relative bg-white/5 border border-white/10 rounded-2xl p-8 h-full">
+                <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-6 text-blue-400 font-bold">
+                  {item.step}
+                </div>
+                <h3 className="text-xl font-semibold mb-3">{item.title}</h3>
+                <p className="text-gray-400">{item.description}</p>
+              </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="border rounded-lg overflow-hidden hover:shadow-lg transition">
-                  <div className="bg-gray-200 h-40 sm:h-48"></div>
-                  <div className="p-4">
-                    <h4 className="font-semibold mb-2 text-sm sm:text-base">Studio {i}</h4>
-                    <p className="text-xs sm:text-sm text-gray-600 mb-4">Professional recording space with equipment</p>
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-sm sm:text-base">$50/hr</span>
-                      <button 
-                        onClick={() => handlePickTime(i)}
-                        className="text-blue-600 text-xs sm:text-sm hover:underline"
-                      >
-                        Pick time
-                      </button>
-                    </div>
-                  </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ForOwners() {
+  return (
+    <section id="for-owners" className="py-20 md:py-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">
+              Own a studio?
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                Earn more.
+              </span>
+            </h2>
+            <p className="text-gray-400 text-lg mb-8">
+              Turn your empty calendar slots into revenue. We handle bookings, 
+              payments, and scheduling so you can focus on what you do best.
+            </p>
+
+            <div className="space-y-4 mb-8">
+              {[
+                "List for free — no monthly fees",
+                "You control your availability and pricing",
+                "Get paid directly to your bank",
+                "Only 10% platform fee per booking"
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
+                  <span className="text-gray-300">{item}</span>
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Why Artists Trust Section */}
-      <section className="py-12 sm:py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-2 sm:mb-4">Why artists trust OTS</h2>
-          <p className="text-center text-gray-600 mb-8 sm:mb-12 text-sm sm:text-base">Built for creators, by creators</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
-            {[
-              { icon: '📅', title: 'Real-time availability', desc: 'What you see is what you get. No surprises.' },
-              { icon: '⚡', title: 'Instant booking', desc: 'Book in under 2 minutes. Confirmed immediately.' },
-              { icon: '🔒', title: 'Payments held securely', desc: 'Your money is safe until your session completes.' },
-            ].map((item, i) => (
-              <div key={i} className="text-center">
-                <div className="text-4xl mb-4">{item.icon}</div>
-                <h3 className="font-semibold text-base sm:text-lg mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm sm:text-base">{item.desc}</p>
-              </div>
-            ))}
+            <Link 
+              href="/list-your-space"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black rounded-full font-medium hover:bg-gray-200 transition"
+            >
+              List Your Studio
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
-        </div>
-      </section>
 
-      {/* For Studio Owners */}
-      <section id="owner" className="py-12 sm:py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-xl p-6 sm:p-12">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">For Studio Owners</h2>
-            <h3 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Turn unused studio time into revenue</h3>
-            <p className="mb-6 sm:mb-8 text-gray-300 text-sm sm:text-base">
-              We handle scheduling, bookings, and payments. You focus on creating.
-            </p>
-            <div className="flex gap-3 sm:gap-4 mb-8 flex-col sm:flex-row">
-              <button 
-                onClick={() => handleNavigation('owner')}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base w-full sm:w-auto"
-              >
-                List your studio
-              </button>
-              <button 
-                onClick={() => alert('Learn more about our owner program - Ready for detailed info page')}
-                className="px-6 py-3 border border-white rounded-lg hover:bg-white/10 text-sm sm:text-base w-full sm:w-auto"
-              >
-                Learn more
-              </button>
-            </div>
-            <div className="grid grid-cols-3 gap-4 sm:gap-8">
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold mb-2">$0</div>
-                <p className="text-gray-300 text-xs sm:text-base">to list</p>
+          <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/10 rounded-3xl p-8">
+            <div className="grid grid-cols-2 gap-6">
+              <div className="text-center p-6 bg-white/5 rounded-2xl">
+                <div className="text-4xl font-bold text-blue-400 mb-2">$0</div>
+                <div className="text-sm text-gray-400">to list</div>
               </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold mb-2">10%</div>
-                <p className="text-gray-300 text-xs sm:text-base">platform fee</p>
+              <div className="text-center p-6 bg-white/5 rounded-2xl">
+                <div className="text-4xl font-bold text-purple-400 mb-2">10%</div>
+                <div className="text-sm text-gray-400">platform fee</div>
               </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold mb-2">24h</div>
-                <p className="text-gray-300 text-xs sm:text-base">payout time</p>
+              <div className="text-center p-6 bg-white/5 rounded-2xl">
+                <div className="text-4xl font-bold text-green-400 mb-2">24h</div>
+                <div className="text-sm text-gray-400">to get paid</div>
+              </div>
+              <div className="text-center p-6 bg-white/5 rounded-2xl">
+                <div className="text-4xl font-bold text-yellow-400 mb-2">$2.4k</div>
+                <div className="text-sm text-gray-400">avg monthly</div>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* FAQ Section */}
-      <section className="py-12 sm:py-16 bg-gray-50">
-        <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Common questions</h2>
-          <div className="space-y-3 sm:space-y-4">
-            {[
-              {
-                q: 'How does payment work?',
-                a: 'Your payment is securely held by Stripe until your session completes. The studio owner receives payment only after your booking is fulfilled.',
-              },
-              {
-                q: 'Can I cancel?',
-                a: 'Yes. Free cancellation up to 24 hours before your session. Cancellations within 24 hours receive a 50% refund.',
-              },
-              {
-                q: 'Is availability real-time?',
-                a: 'Yes. When you see a time slot, it\'s actually available. Our system syncs directly with studio calendars to prevent double-booking.',
-              },
-              {
-                q: 'What types of spaces are listed?',
-                a: 'Recording studios, photo studios, rehearsal spaces, video/film studios, podcast rooms, and creative workspaces.',
-              },
-            ].map((item, i) => (
-              <details key={i} className="group border rounded-lg">
-                <summary className="cursor-pointer p-3 sm:p-4 font-medium flex items-center justify-between hover:bg-white text-sm sm:text-base">
-                  {item.q}
-                  <ChevronDown className="w-5 h-5 group-open:rotate-180 transition flex-shrink-0" />
-                </summary>
-                <div className="px-3 sm:px-4 pb-3 sm:pb-4 text-gray-600 bg-white border-t text-xs sm:text-sm">
-                  {item.a}
-                </div>
-              </details>
-            ))}
-          </div>
+function Testimonials() {
+  return (
+    <section className="py-20 md:py-32 bg-white/5 border-y border-white/10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Loved by Creators</h2>
+          <p className="text-gray-400">See what artists are saying about OneTime</p>
         </div>
-      </section>
 
-      {/* Footer CTA */}
-      <section className="py-12 sm:py-16 bg-white border-t">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Ready to book your next session?</h2>
-          <button 
-            onClick={() => handleNavigation('search')}
-            className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium w-full sm:w-auto"
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              quote: "Booked a session at 2am for 10am same day. Walked in, everything was ready. Game changer.",
+              author: "Marcus T.",
+              role: "Producer",
+            },
+            {
+              quote: "No more DMs, no more waiting. I see what's available, I book, I'm done. Love it.",
+              author: "Sarah K.",
+              role: "Photographer",
+            },
+            {
+              quote: "As a studio owner, I've doubled my bookings. The calendar sync is automatic. Beautiful.",
+              author: "Jamal R.",
+              role: "Studio Owner",
+            }
+          ].map((testimonial, i) => (
+            <div key={i} className="bg-black/50 border border-white/10 rounded-2xl p-6">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, j) => (
+                  <Star key={j} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                ))}
+              </div>
+              <p className="text-gray-300 mb-6">&quot;{testimonial.quote}&quot;</p>
+              <div>
+                <p className="font-semibold">{testimonial.author}</p>
+                <p className="text-sm text-gray-500">{testimonial.role}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CTA() {
+  return (
+    <section className="py-20 md:py-32">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 className="text-4xl md:text-6xl font-bold mb-6">
+          Ready to create?
+        </h2>
+        <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+          Join thousands of artists booking studio space instantly. 
+          No phone calls. No waiting. Just create.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link 
+            href="/studios"
+            className="px-8 py-4 bg-white text-black rounded-full font-medium hover:bg-gray-200 transition inline-flex items-center justify-center gap-2"
           >
-            Find Studios Near You
-          </button>
+            <Zap className="w-5 h-5" />
+            Find a Studio
+          </Link>
+          <Link 
+            href="/list-your-space"
+            className="px-8 py-4 bg-white/10 text-white border border-white/20 rounded-full font-medium hover:bg-white/20 transition"
+          >
+            List Your Space
+          </Link>
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 sm:py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                <Zap className="w-5 h-5" />
-                <span className="font-bold text-sm sm:text-base">OTS</span>
+function Footer() {
+  return (
+    <footer className="border-t border-white/10 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+          <div className="col-span-2 md:col-span-1">
+            <Link href="/" className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Zap className="w-4 h-4 text-white" />
               </div>
-              <p className="text-xs sm:text-sm text-gray-400">The fastest way to book studio space.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">For Bookers</h4>
-              <ul className="space-y-2 text-xs sm:text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white">Search Studios</a></li>
-                <li><a href="#" className="hover:text-white">My Bookings</a></li>
-                <li><a href="#" className="hover:text-white">Help</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">For Owners</h4>
-              <ul className="space-y-2 text-xs sm:text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white">List Studio</a></li>
-                <li><a href="#" className="hover:text-white">Pricing</a></li>
-                <li><a href="#" className="hover:text-white">FAQ</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Legal</h4>
-              <ul className="space-y-2 text-xs sm:text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white">Privacy</a></li>
-                <li><a href="#" className="hover:text-white">Terms</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
-              </ul>
-            </div>
+              <span className="font-bold text-lg">OneTime</span>
+            </Link>
+            <p className="text-sm text-gray-400">
+              The fastest way to book professional studio space.
+            </p>
           </div>
-          <div className="border-t border-gray-800 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm text-gray-400">
-            <p>© 2024 OneTime Studios</p>
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4" />
-              <span>Secured by Stripe</span>
-            </div>
+          
+          <div>
+            <h4 className="font-semibold mb-4">For Artists</h4>
+            <ul className="space-y-2 text-sm text-gray-400">
+              <li><Link href="/studios" className="hover:text-white transition">Search Studios</Link></li>
+              <li><Link href="/how-it-works" className="hover:text-white transition">How It Works</Link></li>
+              <li><Link href="#" className="hover:text-white transition">Help Center</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-4">For Owners</h4>
+            <ul className="space-y-2 text-sm text-gray-400">
+              <li><Link href="/list-your-space" className="hover:text-white transition">List Your Studio</Link></li>
+              <li><Link href="/dashboard/owner" className="hover:text-white transition">Owner Dashboard</Link></li>
+              <li><Link href="#" className="hover:text-white transition">Resources</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-4">Company</h4>
+            <ul className="space-y-2 text-sm text-gray-400">
+              <li><Link href="#" className="hover:text-white transition">About</Link></li>
+              <li><Link href="#" className="hover:text-white transition">Careers</Link></li>
+              <li><Link href="#" className="hover:text-white transition">Privacy</Link></li>
+            </ul>
           </div>
         </div>
-      </footer>
-    </div>
+
+        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-gray-500">
+            © 2024 OneTime Studios. All rights reserved.
+          </p>
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Shield className="w-4 h-4" />
+            <span>Secure payments by Stripe</span>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }

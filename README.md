@@ -1,127 +1,73 @@
-# OneTime Studios (OTS)
+# OneTime Studios
 
-A marketplace + scheduling + payments platform where artists can find studios, see real availability, instantly book, and pay, while studio owners manage listings, calendars, pricing, policies, and payouts.
+A modern marketplace for booking studio space instantly. Built with Next.js 14, TypeScript, Tailwind CSS, Clerk, Supabase, and Stripe.
 
-## Architecture Overview
+## Features
 
-### Tech Stack
+- 🔍 **Real-time Search** - Find available studios by location, date, and time
+- ⚡ **Instant Booking** - Book in under 2 minutes with real-time availability
+- 💳 **Secure Payments** - Stripe-powered payments with Connect for owner payouts
+- 🎨 **Modern Design** - Dark theme with stunning gradients and smooth animations
+- 🔐 **Authentication** - Clerk-powered auth with role-based access
+- 📊 **Owner Dashboard** - Manage your studio, bookings, and earnings
+
+## Tech Stack
+
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS + shadcn/ui
 - **Auth**: Clerk
-- **Database**: PostgreSQL (Supabase/Neon) + Drizzle ORM
-- **Payments**: Stripe (PaymentIntents + Connect)
-- **Maps**: Google Maps / Mapbox (optional)
+- **Database**: Supabase (PostgreSQL)
+- **Payments**: Stripe Connect
+- **Deployment**: Vercel
 
-### Booking Status Lifecycle
-```
-hold → pending_payment → confirmed → completed
-              ↓
-        cancelled / refunded / disputed / no_show
-```
-
-## Project Structure
-
-```
-├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── (booker)/           # Booker routes
-│   │   │   ├── search/         # Studio search
-│   │   │   ├── studios/[slug]/ # Studio detail
-│   │   │   ├── checkout/       # Payment checkout
-│   │   │   ├── confirmation/   # Booking confirmation
-│   │   │   └── bookings/       # My bookings
-│   │   ├── (owner)/            # Owner routes
-│   │   ├── api/                # API routes
-│   │   │   ├── studios/        # Studio CRUD
-│   │   │   ├── bookings/       # Booking operations
-│   │   │   ├── availability/   # Slot availability
-│   │   │   └── webhooks/       # Stripe/Clerk webhooks
-│   │   ├── layout.tsx          # Root layout
-│   │   └── page.tsx            # Landing page
-│   ├── components/
-│   │   └── ui/                 # shadcn/ui components
-│   ├── db/
-│   │   ├── schema.ts           # Database schema
-│   │   └── index.ts            # DB connection
-│   ├── lib/
-│   │   ├── auth.ts             # Auth utilities
-│   │   ├── availability.ts     # Calendar locking logic
-│   │   ├── booking.ts          # Booking lifecycle
-│   │   ├── stripe.ts           # Stripe integration
-│   │   └── utils.ts            # Utilities
-│   ├── types/
-│   │   └── booking.ts          # TypeScript types
-│   └── middleware.ts           # Clerk middleware
-├── drizzle/                    # Database migrations
-├── .env.example                # Environment variables
-└── package.json
-```
-
-## Setup Instructions
+## Quick Start
 
 ### 1. Clone and Install
 
 ```bash
+git clone https://github.com/onetime-studios/onetime-studios.git
 cd onetime-studios
 npm install
 ```
 
-### 2. Environment Variables
+### 2. Environment Setup
 
-Copy `.env.example` to `.env.local` and fill in:
+Copy `.env.example` to `.env.local` and fill in your keys:
 
 ```bash
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/onetime_studios"
+cp .env.example .env.local
+```
 
-# Clerk Auth
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_..."
-CLERK_SECRET_KEY="sk_test_..."
-CLERK_WEBHOOK_SECRET="whsec_..."
+Required environment variables:
 
-# Stripe
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_PUBLISHABLE_KEY="pk_test_..."
-STRIPE_WEBHOOK_SECRET="whsec_..."
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+```env
+# Clerk (https://clerk.com)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
 
-# App Config
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-PLATFORM_FEE_PERCENT="10"
-DISPUTE_WINDOW_HOURS="48"
-HOLD_EXPIRY_MINUTES="10"
+# Supabase (https://supabase.com)
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Stripe (https://stripe.com)
+NEXT_PUBLIC_STRIPE_PUBLIC_KEY=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
 ```
 
 ### 3. Database Setup
 
-```bash
-# Generate migrations
-npm run db:generate
+Run the setup SQL in your Supabase SQL Editor:
 
-# Run migrations
-npm run db:migrate
-```
+1. Go to: `https://supabase.com/dashboard/project/[PROJECT_REF]/sql`
+2. Copy contents of `supabase/setup.sql`
+3. Click "Run"
 
-### 4. Clerk Setup
+Or use the full schema in `supabase/schema.sql` for production.
 
-1. Create account at [clerk.com](https://clerk.com)
-2. Create a new application
-3. Add the following webhook endpoint in Clerk Dashboard:
-   - URL: `https://your-domain.com/api/webhooks/clerk`
-   - Events: `user.created`, `user.updated`, `user.deleted`
-4. Copy the webhook signing secret to `CLERK_WEBHOOK_SECRET`
-
-### 5. Stripe Setup
-
-1. Create account at [stripe.com](https://stripe.com)
-2. Get API keys from Dashboard
-3. Add webhook endpoint:
-   - URL: `https://your-domain.com/api/webhooks/stripe`
-   - Events: `payment_intent.succeeded`, `payment_intent.payment_failed`, `account.updated`
-4. Enable Stripe Connect (Express accounts)
-
-### 6. Run Development Server
+### 4. Run Development Server
 
 ```bash
 npm run dev
@@ -129,85 +75,93 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-## Key Features Implemented
+## Project Structure
 
-### MVP Core
-- [x] User authentication with Clerk (booker/owner/admin roles)
-- [x] Database schema with Drizzle ORM
-- [x] Studio CRUD (owner only)
-- [x] Studio search and detail pages
-- [x] **Availability + Calendar Locking** (critical path)
-  - 10-minute slot holds
-  - Optimistic locking with version field
-  - Database-level unique constraint to prevent double-booking
-- [x] Stripe PaymentIntents integration
-- [x] Booking flow with Stripe Elements
-- [x] Booking confirmation
-- [x] My Bookings page
+```
+onetime-studios/
+├── app/                    # Next.js App Router
+│   ├── page.tsx           # Landing page
+│   ├── layout.tsx         # Root layout with providers
+│   ├── studios/           # Studio pages
+│   ├── dashboard/         # User dashboard
+│   └── api/               # API routes
+├── components/            # React components
+│   └── ui/               # shadcn/ui components
+├── lib/                   # Utility functions
+│   ├── supabase.ts       # Supabase client
+│   └── utils.ts          # Helper functions
+├── supabase/             # Database files
+│   ├── schema.sql        # Full schema
+│   └── setup.sql         # Quick setup
+└── public/               # Static assets
+```
 
-### Booking Lifecycle
-- `hold` → `pending_payment` → `confirmed` → `completed`
-- Cancellation with refund calculation
-- No-show handling
-- Dispute support
+## Database Schema
 
-### Safety Measures
-1. **Double-booking Prevention**:
-   - Partial unique index on `(studio_id, room_id, start_datetime)` where `status = 'booked'`
-   - Optimistic locking with version field
-   - Transaction-based slot updates
+### Core Tables
 
-2. **Payment Safety**:
-   - Manual capture (authorize now, capture later)
-   - Webhook idempotency checking
-   - Payouts only after dispute window
+- **profiles** - User profiles synced from Clerk
+- **studios** - Studio listings with pricing and availability
+- **rooms** - Individual rooms within studios (optional)
+- **bookings** - Booking records with payment status
+- **reviews** - User reviews for studios
+- **favorites** - User's saved studios
 
-3. **Data Integrity**:
-   - All booking state changes in transactions
-   - Cancellation policy snapshot at booking time
-   - Audit trail for all operations
+### Key Features
 
-## API Routes
-
-### Public
-- `GET /api/studios` - Search studios
-- `GET /api/studios/[id]` - Studio detail
-- `GET /api/availability` - Get available slots
-
-### Protected (Auth Required)
-- `POST /api/bookings` - Create booking
-- `GET /api/bookings` - List my bookings
-- `PATCH /api/bookings/[id]` - Cancel/complete booking
-- `POST /api/availability/hold` - Hold slots
-
-### Webhooks
-- `POST /api/webhooks/clerk` - Clerk user sync
-- `POST /api/webhooks/stripe` - Stripe events
-
-## Next Steps (V1)
-
-- [ ] Owner dashboard (calendar, bookings, analytics)
-- [ ] Messaging system
-- [ ] Reviews (post-booking)
-- [ ] Add-ons during checkout
-- [ ] Owner analytics
-- [ ] Admin moderation panel
+- Row Level Security (RLS) for data protection
+- Unique constraints to prevent double-booking
+- Indexes for fast queries
+- Automatic updated_at timestamps
 
 ## Deployment
 
 ### Vercel (Recommended)
 
 1. Push to GitHub
-2. Connect to Vercel
-3. Add environment variables in Vercel Dashboard
-4. Deploy
+2. Import to Vercel
+3. Add environment variables
+4. Deploy!
 
-### Database
+### Environment Variables for Production
 
-- Use Supabase or Neon for managed PostgreSQL
-- Enable PostGIS extension for geospatial queries
+```env
+# Required
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_...
+CLERK_SECRET_KEY=sk_live_...
+NEXT_PUBLIC_SUPABASE_URL=https://...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=ey...
+SUPABASE_SERVICE_ROLE_KEY=ey...
+NEXT_PUBLIC_STRIPE_PUBLIC_KEY=pk_live_...
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Optional
+NEXT_PUBLIC_APP_URL=https://your-domain.com
+PLATFORM_FEE_PERCENT=10
+```
+
+## Development Roadmap
+
+- [x] Landing page with search
+- [x] Database schema
+- [x] Auth with Clerk
+- [ ] Studio listing pages
+- [ ] Booking flow
+- [ ] Owner dashboard
+- [ ] Stripe payments
+- [ ] Real-time availability
+- [ ] Reviews system
+- [ ] Mobile app (future)
 
 ## License
 
-MIT
-# Latest build
+MIT License - see LICENSE file
+
+## Support
+
+For support, email hello@onetime.studio or join our Discord.
+
+---
+
+Built with ❤️ by the OneTime Studios team
