@@ -3,7 +3,7 @@ import { getFeaturedStudios } from '@/lib/data';
 import { Hero } from './hero';
 import { Studio } from '@/types';
 import Link from 'next/link';
-import { MapPin, Star, ArrowRight, Zap, CheckCircle2, Shield } from 'lucide-react';
+import { MapPin, Star, ArrowRight, Zap, CheckCircle2, Shield, Play, Users, TrendingUp } from 'lucide-react';
 
 export default function HomePage() {
   return (
@@ -13,6 +13,12 @@ export default function HomePage() {
       <Suspense fallback={<FeaturedStudiosSkeleton />}>
         <FeaturedStudios />
       </Suspense>
+      
+      {/* Stats Section */}
+      <StatsSection />
+      
+      {/* Categories */}
+      <CategoriesSection />
       
       <HowItWorks />
       <ForOwners />
@@ -24,7 +30,7 @@ export default function HomePage() {
 }
 
 async function FeaturedStudios() {
-  const studios = await getFeaturedStudios(4);
+  const studios = await getFeaturedStudios(8);
 
   return (
     <section id="studios" className="py-20 md:py-32 relative">
@@ -34,6 +40,7 @@ async function FeaturedStudios() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-16">
           <div className="reveal">
+            <span className="text-blue-400 text-sm font-semibold tracking-wider uppercase mb-2 block">Discover</span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-3 md:mb-4">
               Featured <span className="gradient-text">Studios</span>
             </h2>
@@ -58,11 +65,20 @@ async function FeaturedStudios() {
             <p className="text-gray-400 px-4">We&apos;re onboarding new studios every day</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {studios.map((studio, index) => (
-              <StudioCard key={studio.id} studio={studio} index={index} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+              {studios.slice(0, 4).map((studio, index) => (
+                <StudioCard key={studio.id} studio={studio} index={index} />
+              ))}
+            </div>
+            
+            {/* Second Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mt-4 md:mt-6">
+              {studios.slice(4, 8).map((studio, index) => (
+                <StudioCard key={studio.id} studio={studio} index={index + 4} />
+              ))}
+            </div>
+          </>
         )}
 
         <div className="mt-8 md:mt-12 text-center md:hidden">
@@ -70,6 +86,79 @@ async function FeaturedStudios() {
             View all studios
             <ArrowRight className="w-4 h-4" />
           </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function StatsSection() {
+  const stats = [
+    { value: '1,240+', label: 'Studios', icon: '🎵' },
+    { value: '50K+', label: 'Bookings', icon: '📅' },
+    { value: '$2.4M', label: 'Artist Earnings', icon: '💰' },
+    { value: '4.9', label: 'Average Rating', icon: '⭐' },
+  ];
+
+  return (
+    <section className="py-16 md:py-24 border-y border-white/5">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+          {stats.map((stat, i) => (
+            <div key={i} className="text-center reveal" style={{ animationDelay: `${i * 0.1}s` }}>
+              <div className="text-3xl md:text-5xl mb-2">{stat.icon}</div>
+              <div className="text-2xl md:text-4xl font-display font-bold gradient-text mb-1">{stat.value}</div>
+              <div className="text-gray-400 text-sm md:text-base">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CategoriesSection() {
+  const categories = [
+    { name: 'Recording', icon: '🎙️', count: '420+', color: 'from-blue-500 to-cyan-400', image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=600&h=400&fit=crop' },
+    { name: 'Photo', icon: '📸', count: '380+', color: 'from-purple-500 to-pink-400', image: 'https://images.unsplash.com/photo-1542744094-24638eff58bb?w=600&h=400&fit=crop' },
+    { name: 'Video', icon: '🎬', count: '290+', color: 'from-pink-500 to-rose-400', image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=600&h=400&fit=crop' },
+    { name: 'Rehearsal', icon: '🎸', count: '150+', color: 'from-green-500 to-emerald-400', image: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=600&h=400&fit=crop' },
+  ];
+
+  return (
+    <section className="py-20 md:py-32 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12 md:mb-16 reveal">
+          <span className="text-blue-400 text-sm font-semibold tracking-wider uppercase mb-2 block">Browse by</span>
+          <h2 className="text-3xl md:text-5xl font-display font-bold">Studio Categories</h2>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          {categories.map((cat, i) => (
+            <Link 
+              key={i} 
+              href={`/studios?type=${cat.name.toLowerCase()}`}
+              className="group relative rounded-2xl md:rounded-3xl overflow-hidden aspect-[4/3] reveal"
+              style={{ animationDelay: `${i * 0.1}s` }}
+            >
+              {/* Background Image */}
+              <img 
+                src={cat.image} 
+                alt={cat.name}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+              <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
+              
+              {/* Content */}
+              <div className="absolute inset-0 p-4 md:p-6 flex flex-col justify-end">
+                <div className="text-2xl md:text-4xl mb-2">{cat.icon}</div>
+                <h3 className="text-xl md:text-2xl font-display font-bold mb-1">{cat.name}</h3>
+                <p className="text-gray-300 text-sm">{cat.count} studios</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </section>
@@ -202,6 +291,7 @@ function HowItWorks() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-20 reveal">
+          <span className="text-blue-400 text-sm font-semibold tracking-wider uppercase mb-2 block">Simple Process</span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-4 md:mb-6">
             How <span className="gradient-text">OneTime</span> Works
           </h2>
@@ -255,6 +345,7 @@ function ForOwners() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-center">
           <div className="reveal">
+            <span className="text-purple-400 text-sm font-semibold tracking-wider uppercase mb-2 block">For Owners</span>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-4 md:mb-6 leading-tight">
               Own a studio?
               <br />
@@ -351,6 +442,7 @@ function Testimonials() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16 reveal">
+          <span className="text-pink-400 text-sm font-semibold tracking-wider uppercase mb-2 block">Testimonials</span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-3 md:mb-4">
             Loved by <span className="gradient-text">Creators</span>
           </h2>
