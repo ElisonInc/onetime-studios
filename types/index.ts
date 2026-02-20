@@ -41,19 +41,25 @@ export interface Booking {
   id: string;
   studio_id: string;
   booker_id: string;
-  date: string;
-  start_time: string;
-  end_time: string;
-  duration_hours: number;
-  hourly_rate: number;
-  total_amount: number;
-  platform_fee: number;
-  status: 'hold' | 'pending_payment' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'refunded';
-  payment_intent_id?: string;
-  payment_status: 'pending' | 'processing' | 'succeeded' | 'failed' | 'refunded';
-  notes?: string;
+  start_at_utc: string;
+  end_at_utc: string;
+  price_total: number;
+  stripe_payment_intent_id: string | null;
+  status: 'pending' | 'confirmed' | 'cancelled';
+  expires_at: string | null;
+  confirmed_at: string | null;
   created_at: string;
   updated_at: string;
+  // Legacy fields for compatibility with older code
+  date?: string;
+  start_time?: string;
+  end_time?: string;
+  duration_hours?: number;
+  hourly_rate?: number;
+  total_amount?: number;
+  platform_fee?: number;
+  payment_status?: 'pending' | 'processing' | 'succeeded' | 'failed' | 'refunded';
+  notes?: string;
   studio?: Studio;
   booker?: Profile;
 }

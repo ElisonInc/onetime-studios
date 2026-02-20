@@ -59,13 +59,13 @@ export default function DashboardPage() {
   }
 
   const upcomingBookings = bookings.filter(b => 
-    new Date(b.date) >= new Date() && 
-    !['cancelled', 'refunded'].includes(b.status)
+    new Date(b.start_at_utc) >= new Date() && 
+    !['cancelled'].includes(b.status)
   );
 
   const pastBookings = bookings.filter(b => 
-    new Date(b.date) < new Date() || 
-    ['completed', 'cancelled', 'refunded'].includes(b.status)
+    new Date(b.start_at_utc) < new Date() || 
+    ['cancelled'].includes(b.status)
   );
 
   return (
@@ -188,10 +188,10 @@ function BookingCard({ booking, isPast = false }: { booking: Booking; isPast?: b
       {/* Date */}
       <div className="flex-shrink-0 w-20 text-center">
         <div className="text-sm text-gray-400 uppercase">
-          {new Date(booking.date).toLocaleDateString('en-US', { month: 'short' })}
+          {new Date(booking.start_at_utc).toLocaleDateString('en-US', { month: 'short' })}
         </div>
         <div className="text-3xl font-bold">
-          {new Date(booking.date).getDate()}
+          {new Date(booking.start_at_utc).getDate()}
         </div>
       </div>
 
@@ -201,7 +201,7 @@ function BookingCard({ booking, isPast = false }: { booking: Booking; isPast?: b
         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
           <span className="flex items-center gap-1">
             <Clock className="w-4 h-4" />
-            {booking.start_time} - {booking.end_time}
+            {booking.start_at_utc ? new Date(booking.start_at_utc).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : booking.start_time} - {booking.end_at_utc ? new Date(booking.end_at_utc).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : booking.end_time}
           </span>
           <span className="flex items-center gap-1">
             <MapPin className="w-4 h-4" />
@@ -214,11 +214,11 @@ function BookingCard({ booking, isPast = false }: { booking: Booking; isPast?: b
       <div className="flex items-center gap-4">
         <span className={`px-3 py-1 rounded-full text-sm capitalize ${
           booking.status === 'confirmed' ? 'bg-green-500/20 text-green-400' :
-          booking.status === 'pending_payment' ? 'bg-yellow-500/20 text-yellow-400' :
+          booking.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
           booking.status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
           'bg-white/10 text-gray-400'
         }`}>
-          {booking.status.replace('_', ' ')}
+          {booking.status}
         </span>
         {!isPast && (
           <Link 

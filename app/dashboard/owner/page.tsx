@@ -178,15 +178,15 @@ export default function OwnerDashboardPage() {
                       <span className="text-sm text-green-400">+${booking.total_amount}</span>
                     </div>
                     <div className="text-sm text-gray-400">
-                      {booking.date} · {booking.duration_hours} hours
+                      {booking.start_at_utc ? new Date(booking.start_at_utc).toLocaleDateString() : booking.date} · {booking.duration_hours || Math.round((new Date(booking.end_at_utc).getTime() - new Date(booking.start_at_utc).getTime()) / (1000 * 60 * 60))} hours
                     </div>
                     <div className="mt-2">
                       <span className={`text-xs px-2 py-1 rounded-full capitalize ${
                         booking.status === 'confirmed' ? 'bg-green-500/20 text-green-400' :
-                        booking.status === 'pending_payment' ? 'bg-yellow-500/20 text-yellow-400' :
+                        booking.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
                         'bg-white/10 text-gray-400'
                       }`}>
-                        {booking.status.replace('_', ' ')}
+                        {booking.status}
                       </span>
                     </div>
                   </div>

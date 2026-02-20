@@ -98,17 +98,20 @@ export function BookContent() {
     const endHours = hours + duration;
     const endTime = `${endHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 
+    // Build UTC timestamps from date and time strings
+    const startAtUtc = new Date(`${date}T${time}:00`).toISOString();
+    const endAtUtc = new Date(`${date}T${endTime}:00`).toISOString();
+
     const booking = await createBooking({
-      studio_id: studioId,
+      studio_id: studioId!,
       booker_id: userId,
-      date,
-      start_time: time,
-      end_time: endTime,
-      duration_hours: duration,
-      hourly_rate: hourlyRate,
-      total_amount: total,
-      platform_fee: serviceFee,
-      status: 'pending_payment',
+      start_at_utc: startAtUtc,
+      end_at_utc: endAtUtc,
+      price_total: total,
+      stripe_payment_intent_id: null,
+      status: 'pending',
+      expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(), // 15 min hold
+      confirmed_at: null,
     });
 
     setProcessing(false);
