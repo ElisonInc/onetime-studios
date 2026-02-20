@@ -1,10 +1,20 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Navigation } from "@/components/navigation";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "OneTime Studios | Book Studio Space Instantly",
@@ -24,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   if (!publishableKey) {
     return (
       <html lang="en" className="dark">
-        <body className={`${inter.className} bg-black text-white min-h-screen`}>
+        <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans bg-black text-white min-h-screen`}>
           <Navigation />
           <main className="pt-16 md:pt-20">{children}</main>
         </body>
@@ -46,7 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       }}
     >
       <html lang="en" className="dark">
-        <body className={`${inter.className} bg-black text-white min-h-screen`}>
+        <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans bg-black text-white min-h-screen antialiased`}>
           <Navigation />
           <main className="pt-16 md:pt-20">{children}</main>
         </body>
