@@ -233,8 +233,16 @@ function StudioCard({ studio }: { studio: Studio }) {
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col md:flex-row gap-6">
       {/* Image */}
-      <div className="w-full md:w-48 h-32 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center text-4xl flex-shrink-0">
-        🎵
+      <div className="w-full md:w-48 h-32 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center text-4xl flex-shrink-0 overflow-hidden">
+        {studio.cover_image || studio.images?.[0] ? (
+          <img 
+            src={studio.cover_image || studio.images?.[0]} 
+            alt={studio.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span>🎵</span>
+        )}
       </div>
 
       {/* Info */}

@@ -181,13 +181,24 @@ function StudioCard({ studio }: { studio: Studio }) {
   };
 
   const emoji = studio.studio_type?.[0] ? typeEmoji[studio.studio_type[0]] || '🎵' : '🎵';
+  const imageUrl = studio.cover_image || studio.images?.[0];
 
   return (
     <Link href={`/studios/${studio.slug}`} className="group">
       <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-all duration-300 hover:transform hover:scale-[1.02]">
-        {/* Image Placeholder */}
-        <div className="aspect-[4/3] bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-6xl relative overflow-hidden">
-          {emoji}
+        {/* Image */}
+        <div className="aspect-[4/3] bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
+          {imageUrl ? (
+            <img 
+              src={imageUrl} 
+              alt={studio.name}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-6xl">
+              {emoji}
+            </div>
+          )}
           <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-lg text-xs text-white">
             ${studio.hourly_rate}/hr
           </div>

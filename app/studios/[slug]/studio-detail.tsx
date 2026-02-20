@@ -20,40 +20,25 @@ interface StudioDetailProps {
   studio: Studio;
 }
 
-const typeEmoji: Record<string, string> = {
-  recording: '🎵',
-  photography: '📸',
-  video: '🎬',
-  rehearsal: '🎸',
-  podcast: '🎙️',
-};
-
 export function StudioDetail({ studio }: StudioDetailProps) {
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [duration, setDuration] = useState<number>(2);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const emoji = studio.studio_type?.[0] ? typeEmoji[studio.studio_type[0]] || '🎵' : '🎵';
   const totalPrice = studio.hourly_rate * duration;
-
   const today = new Date().toISOString().split('T')[0];
 
-  // Generate time slots (9 AM to 10 PM)
   const timeSlots = [];
   for (let i = 9; i <= 22; i++) {
     timeSlots.push(`${i.toString().padStart(2, '0')}:00`);
   }
 
   const handleBookNow = () => {
-    if (!isSignedIn) {
-      // Show sign in modal or redirect
-      return;
-    }
-    if (!selectedDate || !selectedTime) {
-      return;
-    }
+    if (!isSignedIn) return;
+    if (!selectedDate || !selectedTime) return;
 
     const params = new URLSearchParams({
       studio: studio.id,
@@ -64,6 +49,20 @@ export function StudioDetail({ studio }: StudioDetailProps) {
 
     router.push(`/book?${params.toString()}`);
   };
+
+  const nextImage = () => {
+    if (studio.images && studio.images.length > 0) {
+      setCurrentImageIndex((prev) => (prev + 1) % studio.images.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (studio.images && studio.images.length > 0) {
+      setCurrentImageIndex((prev) => (prev - 1 + studio.images.length) % studio.images.length);
+    }
+  };
+
+  const currentImage = studio.images?.[currentImageIndex] || studio.cover_image;
 
   return (
     <div className="min-h-screen bg-black pb-20">
@@ -82,16 +81,73 @@ export function StudioDetail({ studio }: StudioDetailProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Hero Image */}
-            <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl flex items-center justify-center text-8xl relative overflow-hidden">
-              {emoji}
+            {/* Hero Image Gallery */}
+            <div className="relative aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl overflow-hidden">
+              {currentImage ? (
+                <img 
+                  src={currentImage} 
+                  alt={studio.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-8xl">
+                  🎵
+                </div>
+              )}
+              
               {studio.is_verified && (
                 <div className="absolute top-4 left-4 bg-blue-500/20 backdrop-blur-sm border border-blue-500/30 px-3 py-1 rounded-full text-xs text-blue-300 flex items-center gap-1">
                   <Shield className="w-3 h-3" />
                   Verified
                 </div>
               )}
+
+              {/* Image Navigation */}
+              {studio.images && studio.images.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {studio.images.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentImageIndex(idx)}
+                        className={`w-2 h-2 rounded-full transition ${
+                          idx === currentImageIndex ? 'bg-white' : 'bg-white/40'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
+
+            {/* Thumbnail Grid */}
+            {studio.images && studio.images.length > 1 && (
+              <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+                {studio.images.slice(0, 6).map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    className={`aspect-square rounded-lg overflow-hidden border-2 transition ${
+                      idx === currentImageIndex ? 'border-blue-500' : 'border-transparent'
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Header */}
             <div>
@@ -227,7 +283,7 @@ export function StudioDetail({ studio }: StudioDetailProps) {
               {/* Price Breakdown */}
               <div className="border-t border-white/10 pt-4 mb-6 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">${studio.hourly_rate} × {duration} hours</span>
+                  <span className="text-gray-400">${studio.hourly_rate} x {duration} hours</span>
                   <span>${totalPrice}</span>
                 </div>
                 <div className="flex justify-between text-sm">

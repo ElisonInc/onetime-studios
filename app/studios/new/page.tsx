@@ -6,6 +6,7 @@ import { useAuth } from '@clerk/nextjs';
 import Link from 'next/link';
 import { ArrowLeft, Plus, X } from 'lucide-react';
 import { createStudio } from '@/lib/data';
+import { ImageUpload } from '@/components/image-upload';
 
 const studioTypes = [
   { value: 'recording', label: 'Recording Studio' },
@@ -25,6 +26,7 @@ export default function NewStudioPage() {
   const { isSignedIn, userId } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [images, setImages] = useState<string[]>([]);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -77,6 +79,8 @@ export default function NewStudioPage() {
       minimum_booking_hours: parseInt(formData.minimumHours),
       studio_type: formData.studioTypes,
       amenities: formData.amenities,
+      images: images,
+      cover_image: images[0] || null,
       status: 'active',
     });
 
@@ -134,6 +138,16 @@ export default function NewStudioPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Images */}
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+            <h2 className="text-lg font-semibold mb-4">Photos</h2>
+            <p className="text-sm text-gray-400 mb-4">
+              Add photos of your studio. The first image will be the cover photo.
+            </p>
+            <ImageUpload images={images} onChange={setImages} maxImages={10} />
+          </div>
+
+          {/* Basic Info */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
             <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
             <div className="space-y-4">
@@ -155,6 +169,7 @@ export default function NewStudioPage() {
             </div>
           </div>
 
+          {/* Studio Type */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
             <h2 className="text-lg font-semibold mb-4">Studio Type *</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -175,6 +190,7 @@ export default function NewStudioPage() {
             </div>
           </div>
 
+          {/* Location */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
             <h2 className="text-lg font-semibold mb-4">Location *</h2>
             <div className="space-y-4">
@@ -213,6 +229,7 @@ export default function NewStudioPage() {
             </div>
           </div>
 
+          {/* Pricing */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
             <h2 className="text-lg font-semibold mb-4">Pricing</h2>
             <div className="grid grid-cols-2 gap-4">
@@ -241,6 +258,7 @@ export default function NewStudioPage() {
             </div>
           </div>
 
+          {/* Amenities */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
             <h2 className="text-lg font-semibold mb-4">Amenities</h2>
             <div className="flex flex-wrap gap-2 mb-4">
