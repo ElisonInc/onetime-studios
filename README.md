@@ -1,8 +1,14 @@
 # OneTime Studios
 
+**Status: experimental marketplace prototype.**
+
 **OneTime Studios** is a marketplace concept for discovering and booking recording studio space with a faster, more transparent booking experience.
 
 This repository represents the product prototype and systems design behind the platform, including marketplace search, authentication, studio inventory, booking architecture, payments, owner tooling, and database security.
+
+## For hiring teams
+
+This project is best evaluated as a **two-sided marketplace systems exercise**, not as a claim that every marketplace feature is production-complete. The strongest evidence here is the product model, customer/owner workflow separation, booking integrity decisions, auth boundaries, and Stripe Connect architecture.
 
 ## Product goal
 
