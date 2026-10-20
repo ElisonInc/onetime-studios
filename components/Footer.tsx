@@ -77,7 +77,7 @@ export function Footer() {
         {/* Divider */}
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-sm">© 2024 OneTime Studios. All rights reserved.</p>
+            <p className="text-sm">© {new Date().getFullYear()} OneTime Studios. All rights reserved.</p>
             <div className="flex items-center gap-2 text-sm">
               <Shield className="w-4 h-4" />
               <span>Secured by Stripe</span>
