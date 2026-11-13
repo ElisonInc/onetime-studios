@@ -1,108 +1,115 @@
 # OneTime Studios
 
-**Status: experimental marketplace prototype.**
+**Status: experimental prototype. Paused in practice:** the last feature work was in February 2026. Since then, commits have only changed docs and small fixes (most recent October 2026).
 
-**OneTime Studios** is a marketplace concept for discovering and booking recording studio space with a faster, more transparent booking experience.
+OneTime Studios is a marketplace prototype for finding and booking recording studio space. Artists browse studios, check availability and book a time slot. Studio owners list their spaces and manage bookings. It is a product of **Elison Inc.**
 
-This repository represents the product prototype and systems design behind the platform, including marketplace search, authentication, studio inventory, booking architecture, payments, owner tooling, and database security.
+## For reviewers
 
-## For hiring teams
+Look at this project as a **two-sided marketplace systems exercise**, not as a finished product. The most useful parts to review are:
 
-This project is best evaluated as a **two-sided marketplace systems exercise**, not as a claim that every marketplace feature is production-complete. The strongest evidence here is the product model, customer/owner workflow separation, booking integrity decisions, auth boundaries, and Stripe Connect architecture.
+- the data model
+- how customer and owner workflows are kept separate
+- how the database guards against double booking
+- the auth boundaries
+- the payment flow
 
-## Product goal
+## What's in the repo
 
-Recording studio booking is often handled through DMs, phone calls, spreadsheets, and manual back-and-forth. OneTime Studios explores a more structured marketplace experience where artists can discover studios, view availability, and move toward booking in one workflow.
+- **Studio discovery:** studio listing (`/studios`) and studio detail pages (`/studios/[slug]`)
+- **Booking flow:** `/book`, with availability API routes (`available-dates`, `available-times`). Times are calculated with `date-fns` / `date-fns-tz`.
+- **Payments:** Stripe PaymentIntent creation, booking confirmation and a Stripe webhook route
+- **Authentication:** Clerk, with middleware covering app and API routes and modal sign-in/sign-up
+- **Owner tooling:** owner dashboard (`/dashboard/owner`), new-studio form (`/studios/new`) and a "List your space" page
+- **Image uploads:** a Cloudinary-backed `/api/upload` route
+- **Marketing pages:** landing page sections, "How it works" and an FAQ
 
-## Core product areas
+### Known gaps (as of the last review)
 
-- **Studio discovery** — Search and browse studio inventory by location and availability
-- **Booking workflows** — Structured booking architecture designed to reduce manual coordination
-- **Authentication** — User and studio-owner access through Clerk
-- **Marketplace payments** — Stripe Connect architecture for customer payments and owner payouts
-- **Owner tooling** — Dashboard concepts for managing studios, bookings, and earnings
-- **Data protection** — Supabase/PostgreSQL with Row Level Security and constraints designed to reduce double-booking risk
+- **Stripe Connect is designed but not built.** Owner payout columns exist in the schema, but the payment route creates a standard PaymentIntent with no transfers to owners.
+- **The homepage search results use mock data** (`lib/mockStudios.ts`). The other pages read from Supabase through `lib/data.ts`.
+- **The SQL scripts in `supabase/` haven't been consolidated.** Several setup, reset and fix scripts exist side by side. One commit message mentions UTC booking fields (`start_at_utc` / `end_at_utc`), but `schema.sql` uses separate date and time columns. Which script matches the current code is unconfirmed.
+- **No automated tests** and no CI configuration.
 
 ## Tech stack
 
-- **Framework:** Next.js 14 (App Router)
-- **Language:** TypeScript
-- **UI:** Tailwind CSS + shadcn/ui
-- **Authentication:** Clerk
+- **Framework:** Next.js 14 (App Router), React 18, TypeScript
+- **UI:** Tailwind CSS, `tailwindcss-animate`, Framer Motion, lucide-react
+- **Auth:** Clerk (`@clerk/nextjs`)
 - **Database:** Supabase / PostgreSQL
-- **Payments:** Stripe Connect
-- **Deployment:** Vercel
+- **Payments:** Stripe
+- **Media:** Cloudinary
+- **Hosting:** Vercel was the intended host (unconfirmed; the repo has no Vercel config)
 
-## Architecture
+## Project structure
 
 ```text
-onetime-studios/
-├── app/                    # Next.js application routes
-│   ├── studios/            # Studio discovery and detail flows
-│   ├── dashboard/          # User / owner dashboard concepts
-│   └── api/                # Server-side routes
-├── components/             # Shared React UI
-├── lib/                    # Utilities and service clients
-├── supabase/               # Database schema and setup
-└── public/                 # Static assets
+app/
+  api/            # availability, bookings (payment intent, confirm), stripe-webhook, upload
+  book/           # booking flow
+  dashboard/      # user dashboard and owner dashboard
+  studios/        # listing, detail ([slug]), new studio
+  how-it-works/, list-your-space/
+components/       # shared UI (Navbar, Footer, SearchBar, StudioCard, FAQ, …)
+lib/              # Supabase/Stripe/Cloudinary clients, data access, availability, types
+supabase/         # schema, setup/reset scripts, seed data, debug/fix scripts
+docs/history/     # archived specs and implementation notes
+middleware.ts     # Clerk middleware
 ```
 
-## Product / engineering decisions
+## Data model
 
-### Model both sides of the marketplace
-A studio marketplace is not only a search UI. The system needs separate customer and owner workflows, inventory state, booking records, payment movement, and permission boundaries.
+`supabase/schema.sql` defines these tables:
 
-### Put booking integrity in the data model
-Availability conflicts are not something the UI alone should prevent. The schema uses database constraints, indexing, and Row Level Security as part of the booking and access model.
-
-### Design payments as a marketplace flow
-Stripe Connect is used as the architectural direction because the product needs to reason about both customer payments and studio-owner payouts rather than a single merchant checkout.
-
-## Database design
-
-The prototype models the core marketplace entities:
-
-- `profiles`
+- `profiles` (keyed by Clerk user ID)
 - `studios`
 - `rooms`
+- `availability_slots`
 - `bookings`
 - `reviews`
 - `favorites`
 
-The schema includes Row Level Security, indexing, timestamps, and uniqueness constraints intended to support safer multi-user booking workflows.
+The schema also includes:
 
-## What I owned
+- Row Level Security policies
+- indexes
+- `updated_at` triggers
+- a partial unique index that blocks double-booking of confirmed slots
 
-I defined the product concept and marketplace workflow, shaped the customer/owner experience, selected the system boundaries and services, directed implementation, reviewed the architecture and code, and tested the prototype against the intended booking flow.
+## Running locally
 
-This project is useful in my portfolio because it demonstrates product and systems thinking outside AI: multi-sided marketplace design, auth, payments, relational data modeling, and operational workflows.
+Prerequisites:
 
-## Local development
+- Node.js
+- your own Clerk, Supabase and Stripe accounts
+- a Cloudinary account (only needed for image uploads)
 
 ```bash
 git clone https://github.com/ElisonInc/onetime-studios.git
 cd onetime-studios
 npm install
-cp .env.example .env.local
+cp .env.example .env.local   # fill in your own keys
 npm run dev
 ```
 
-Required services include Clerk, Supabase, and Stripe. See `.env.example` for configuration details.
+Other scripts:
 
-## Project status
+- `npm run build` creates a production build
+- `npm start` serves the build
+- `npm run lint` runs Next.js lint
 
-OneTime Studios is an **experimental marketplace prototype**, not a claim that every planned marketplace feature is production-complete. The repository is maintained as part of the ELISON INC product portfolio and documents the product direction, architecture, and implementation work behind the concept.
+**Environment variables:** `.env.example` lists the Clerk, Supabase and Stripe keys. It doesn't include the Cloudinary keys, so add `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and `CLOUDINARY_API_SECRET` yourself if you need uploads.
 
-## Related portfolio work
+**Database:** run `supabase/schema.sql` in your Supabase project's SQL editor. Then, if you want sample studios, run `supabase/seed_data.sql`. Check the scripts against the code first (see Known gaps).
 
-- **[DevHouse AI](https://github.com/emorban/devhouse-ai)** — AI automation, workflow orchestration, integrations, and reliability
-- **[SongSplit](https://github.com/ElisonInc/songsplit-app)** — music-tech collaboration and record-integrity workflow
-- **[Elison’s World](https://github.com/emorban/elison-world-website)** — interactive creative technology and frontend product work
+## Ownership
 
-## About ELISON INC
-
-OneTime Studios is a product project under **ELISON INC**, alongside work in AI systems, automation, music technology, and digital products.
+OneTime Studios is a product prototype under **Elison Inc.** Elison Morban defined the concept and marketplace workflow, directed the implementation and reviewed the architecture.
 
 ## License
 
-MIT License — see `LICENSE`.
+No licence file is included in this repository, and `package.json` is marked `private`. Until a licence is added, all rights are reserved.
+
+---
+
+Last reviewed: 2026-11-12
